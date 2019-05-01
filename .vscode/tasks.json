@@ -1,0 +1,68 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build API",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/orders-api/OrdersApi.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Publish API",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/orders-api/OrdersApi.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Watch API",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "${workspaceFolder}/orders-api/OrdersApi.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+
+        {
+            "label": "Build Site",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/main-site/GoatStore.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Publish Site",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "publish",
+                "${workspaceFolder}/main-site/GoatStore.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        },
+        {
+            "label": "Watch Site",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "watch",
+                "run",
+                "${workspaceFolder}/main-site/GoatStore.csproj"
+            ],
+            "problemMatcher": "$tsc"
+        }        
+    ]
+}

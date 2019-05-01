@@ -1,0 +1,23 @@
+﻿@page
+@model ProductsModel
+
+@{
+    ViewData["Title"] = "Products";
+}
+<h1>Goats For Sale</h1>
+
+<table>
+@foreach (var goat in Model.Goats)
+{
+  <div class="card" style="width:500px">
+    <img class="card-img-top" src="@goat.Image" alt="Card image cap">
+    <div class="card-body">
+      <h3 class="card-title">@goat.Name</h3>
+      <p class="card-text">@goat.Description</p>
+      <button class="btn btn-info">More Info</button>
+      <button class="btn btn-success">Add To Basket</button>
+    </div>
+  </div>
+  <br>
+}
+</table>

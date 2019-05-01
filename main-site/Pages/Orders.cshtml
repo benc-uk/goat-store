@@ -1,0 +1,25 @@
+﻿@page
+@model GoatStore.Pages.OrdersModel
+
+@{
+    ViewData["Title"] = "Orders";
+}
+<h1>Current Orders</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+      <th scope="col">Order Id</th>
+      <th scope="col">Ammount</th>
+      <th scope="col">Location</th>
+    </tr>
+  </thead>
+@foreach (var order in Model.Orders)
+{
+  <tr>
+    <td>@order.Id</td>
+    <td>£@order.Amount</td>
+    <td>@order.Location</td>
+  </tr>
+}
+</table>
