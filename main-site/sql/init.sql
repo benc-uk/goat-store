@@ -1,6 +1,3 @@
---USE goatstore;
---go
-
 DROP TABLE [dbo].[products];
 go
 

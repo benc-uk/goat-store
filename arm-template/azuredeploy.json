@@ -11,7 +11,7 @@
 
   "variables": {
     "planName":       "appservice-plan",
-    "planTier":       "S1",
+    "planTier":       "P1v2",
     "planInstances":  "1",
 
     "siteName":       "[parameters('siteNamePrefix')]",
@@ -25,7 +25,10 @@
 
     "gitRepoURL":     "https://github.com/benc-uk/goat-store.git",
 
-    "vnetName":       "demo-vnet"
+    "vnetName":       "demoapp-vnet",
+    "subnetName":     "websubnet",
+    "vnetSpace":      "192.168.0.0/16",
+    "subnetPrefix":   "192.168.50.0/24"
   },
 
   "resources": [
@@ -123,16 +126,15 @@
       "location": "[resourceGroup().location]",
       "properties": {
         "addressSpace": {
-          "addressPrefixes": [ "10.200.0.0/16" ]
+          "addressPrefixes": [ "[variables('vnetSpace')]" ]
         },
         "subnets": [
           {
-            "name": "integration",
+            "name": "[variables('subnetName')]",
             "properties": { 
-              "addressPrefix": "10.200.122.0/24",
+              "addressPrefix": "[variables('subnetPrefix')]",
               "serviceEndpoints": [
-                { "service": "Microsoft.Sql" },
-                { "service": "Microsoft.Web" }
+                { "service": "Microsoft.Sql" }
               ]              
             }
           }
@@ -165,7 +167,7 @@
           "dependsOn": [
             "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
           ]
-        }   
+        }         
       ]
     }
  
