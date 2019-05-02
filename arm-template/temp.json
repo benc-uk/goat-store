@@ -1,0 +1,40 @@
+            "connectionStrings": [
+              {
+                "name": "[variables('connStringName')]",
+                "connectionString": "[concat('Connection Timeout=10;Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sqlDbName'), ';User Id=', variables('sqlUser'), '@', variables('sqlServerName'), ';Password=', variables('sqlPassword'), ';')]",
+                "type": 2
+              }
+            ],
+
+
+            ,
+        "resources": [
+          {
+            "apiVersion": "2018-02-01",
+            "name": "web",
+            "type": "sourcecontrols",
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/Sites', variables('siteName'))]"
+            ],
+            "properties": {
+                "repoUrl": "[variables('gitRepoURL')]",
+                "branch": "master",
+                "IsManualIntegration": true
+            }
+          }
+        ]
+
+
+
+        
+    {
+      "type": "Microsoft.Network/virtualNetworks/subnets",
+      "apiVersion": "2018-12-01",
+      "name": "[concat(variables('vnetName'), '/web')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', variables('vnetName'))]"
+      ],
+      "properties": {
+        "addressPrefix": "10.200.122.0/24"
+      }
+    } 

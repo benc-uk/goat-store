@@ -1,0 +1,180 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+
+  "parameters": {
+     "siteNamePrefix": {
+        "type": "string",
+        "defaultValue": "goatstore"
+     }
+  },
+
+  "variables": {
+    "planName":       "appservice-plan",
+    "planTier":       "S1",
+    "planInstances":  "1",
+
+    "siteName":       "[parameters('siteNamePrefix')]",
+    "apiName":        "[concat(parameters('siteNamePrefix'), '-api')]",
+
+    "connStringName": "MainDatabase",
+    "sqlServerName":  "[concat(parameters('siteNamePrefix'), '-sqlsrv')]",
+    "sqlDbName":      "storedb",
+    "sqlUser":        "dbadmin",
+    "sqlPassword":    "Password123!",
+
+    "gitRepoURL":     "https://github.com/benc-uk/goat-store.git",
+
+    "vnetName":       "demo-vnet"
+  },
+
+  "resources": [
+    {
+      "name": "[variables('planName')]",
+      "type": "Microsoft.Web/serverfarms",
+      "apiVersion": "2018-02-01",
+      "kind": "windows",
+      "location": "[resourceGroup().location]",
+      "properties": {},
+      "sku": {
+        "name": "[variables('planTier')]",
+        "capacity": "[variables('planInstances')]"
+      }
+    },  
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('siteName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+        "siteConfig": {
+          "appSettings": [
+            { "name": "PROJECT", "value": "main-site/GoatStore.csproj" },
+            { "name": "API_ENDPOINT_ORDERS", "value": "[concat('https://', variables('apiName'), '.azurewebsites.net/api')]" }            
+          ],
+          "connectionStrings": [
+            {
+              "name": "[variables('connStringName')]",
+              "connectionString": "[concat('Connection Timeout=10;Data Source=tcp:', reference(concat('Microsoft.Sql/servers/', variables('sqlServerName'))).fullyQualifiedDomainName, ',1433;Initial Catalog=', variables('sqlDbName'), ';User Id=', variables('sqlUser'), '@', variables('sqlServerName'), ';Password=', variables('sqlPassword'), ';')]",
+              "type": 2
+            }
+          ]     
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2018-02-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', variables('siteName'))]"
+          ],
+          "properties": {
+              "repoUrl": "[variables('gitRepoURL')]",
+              "branch": "master",
+              "IsManualIntegration": true
+          }
+        }
+      ]
+    },
+
+    {
+      "type": "Microsoft.Web/sites",
+      "apiVersion": "2018-02-01",
+      "name": "[variables('apiName')]",
+      "location": "[resourceGroup().location]",
+      "dependsOn": [
+        "[concat('Microsoft.Web/serverfarms/', variables('planName'))]"
+      ],
+      "properties": {
+        "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('planName'))]",
+        "siteConfig": {
+          "appSettings": [
+            { "name": "PROJECT", "value": "orders-api/OrdersApi.csproj" }
+          ]    
+        }
+      },
+      "resources": [
+        {
+          "apiVersion": "2018-02-01",
+          "name": "web",
+          "type": "sourcecontrols",
+          "dependsOn": [
+              "[resourceId('Microsoft.Web/Sites', variables('apiName'))]"
+          ],
+          "properties": {
+              "repoUrl": "[variables('gitRepoURL')]",
+              "branch": "master",
+              "IsManualIntegration": true
+          }
+        }
+      ]
+    },
+
+    {
+      "name": "[variables('vnetName')]",
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2018-11-01",
+      "location": "[resourceGroup().location]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [ "10.200.0.0/16" ]
+        },
+        "subnets": [
+          {
+            "name": "integration",
+            "properties": { 
+              "addressPrefix": "10.200.122.0/24",
+              "serviceEndpoints": [
+                { "service": "Microsoft.Sql" },
+                { "service": "Microsoft.Web" }
+              ]              
+            }
+          }
+        ]
+      }
+    },
+    
+    {
+      "type": "Microsoft.Sql/servers",
+      "kind": "v12.0",
+      "name": "[variables('sqlServerName')]",
+      "apiVersion": "2015-05-01-preview",
+      "location": "[resourceGroup().location]",
+      "properties": {
+         "administratorLogin": "[variables('sqlUser')]",
+         "administratorLoginPassword": "[variables('sqlPassword')]",
+         "version": "12.0"
+      },
+      "resources": [
+        {
+          "type": "databases",
+          "name": "[variables('sqlDbName')]",
+          "apiVersion": "2015-05-01-preview",
+          "location": "[resourceGroup().location]",
+          "properties": {
+             "edition": "Basic",
+             "collation": "SQL_Latin1_General_CP1_CI_AS",
+             "requestedServiceObjectiveName": "Basic"
+          },
+          "dependsOn": [
+            "[resourceId('Microsoft.Sql/servers', variables('sqlServerName'))]"
+          ]
+        }   
+      ]
+    }
+ 
+  ],
+
+  "outputs": {
+     "siteUrl": {
+        "type": "string",
+        "value": "[concat('https://', reference(variables('siteName')).hostNames[0])]"
+     }
+  }
+}
