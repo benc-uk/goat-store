@@ -14,4 +14,13 @@ ARM template is supplied to deploy the entire system, with two App Services, App
 
 A VNet is created for integration but no integration is setup in the template. Configuration of VNet integration with App Service is left as a post deployment manual task
 
+# Database
+Credentials:
+- Username is `dbadmin`
+- Password is `Password123!`
+- Database name is `storedb`
+
+SQL to init the `products` table and load sample data, is located here [main-site/sql/](main-site/sql/)
+
+
 [![deploy](https://raw.githubusercontent.com/benc-uk/azure-arm/master/etc/azuredeploy.png)](https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2Fbenc-uk%2Fgoat-store%2Fmaster%2Farm-template%2Fazuredeploy.json)
