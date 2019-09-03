@@ -11,7 +11,7 @@
 
   "variables": {
     "planName":       "appservice-plan",
-    "planTier":       "P1v2",
+    "planTier":       "P2v2",
     "planInstances":  "1",
 
     "siteName":       "[parameters('siteNamePrefix')]",
@@ -134,7 +134,8 @@
             "properties": { 
               "addressPrefix": "[variables('subnetPrefix')]",
               "serviceEndpoints": [
-                { "service": "Microsoft.Sql" }
+                { "service": "Microsoft.Sql" },
+                { "service": "Microsoft.Web" }
               ]              
             }
           }
